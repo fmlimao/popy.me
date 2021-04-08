@@ -16,23 +16,25 @@ module.exports = async (req, res) => {
     };
 
     try {
-        const users = await UserRepository.findAll();
+        const usersRet = await UserRepository.findAll({
+            filter: req.query,
+        });
 
         if (draw) {
-            retDatatable.data = users.content.users;
+            retDatatable.data = usersRet.content.users;
 
-            retDatatable.recordsTotal = users.content.totalCount;
-            retDatatable.recordsFiltered = users.content.filteredCount;
+            retDatatable.recordsTotal = usersRet.content.totalCount;
+            retDatatable.recordsFiltered = usersRet.content.filteredCount;
 
             res.status(200).json(retDatatable);
         } else {
             const meta = {
-                recordsTotal: users.content.totalCount,
-                recordsFiltered: users.content.filteredCount,
+                recordsTotal: usersRet.content.totalCount,
+                recordsFiltered: usersRet.content.filteredCount,
             };
 
             ret.addContent('meta', meta);
-            ret.addContent('users', users.content.users);
+            ret.addContent('users', usersRet.content.users);
 
             res.status(ret.getCode()).json(ret.generate());
         }
