@@ -207,6 +207,105 @@ class UsersRepository {
 
     }
 
+    static update(user_id, fields) {
+
+        return this.findOne({ user_id })
+            .then(async findRet => {
+                const user = findRet.content.user;
+
+                const ret = new JsonReturn();
+
+                ret.addFields(['name', 'email', 'password']);
+
+                const { name, email, password } = fields;
+
+                if (!validator(ret, {
+                    name,
+                    email,
+                    password,
+                }, {
+                    name: 'string|min:3|max:128',
+                    email: 'string|email|max:128',
+                    password: 'string|max:32',
+                })) {
+                    ret.setError(true);
+                    ret.setCode(400);
+                    ret.addMessage('Verifique todos os campos.');
+                    throw ret;
+                }
+
+                const next = {
+                    name,
+                    email,
+                    password,
+                    user,
+                    ret,
+                };
+
+                return next;
+            })
+            .then(async next => {
+                if (next.email) {
+                    const userExists = await connRead.getOne(`
+                        SELECT user_id
+                        FROM users
+                        WHERE deleted_at IS NULL
+                        AND email = ?
+                        AND user_id != ?;
+                    `, [
+                        next.email,
+                        user_id,
+                    ]);
+
+                    if (userExists) {
+                        next.ret.setFieldError('email', true, 'Já existe um usuário com este e-mail.');
+
+                        next.ret.setError(true);
+                        next.ret.setCode(400);
+                        next.ret.addMessage('Verifique todos os campos.');
+
+                        throw next.ret;
+                    }
+                }
+
+                return next;
+            })
+            .then(next => {
+                if (typeof next.name !== 'undefined') next.user.name = next.name;
+                if (typeof next.email !== 'undefined') next.user.email = next.email;
+                if (typeof next.password !== 'undefined') {
+                    next.user.email = next.email;
+
+                    next.saltLength = Number(process.env.AUTH_SALT_LENGTH);
+                    next.user.salt = bcrypt.genSaltSync(next.saltLength);
+                    next.user.password = bcrypt.hashSync(next.password, next.user.salt);
+                }
+
+                return next;
+            })
+            .then(async next => {
+                await connWrite.update(`
+                    UPDATE users
+                    SET name = ?
+                    , email = ?
+                    , password = ?
+                    , salt = ?
+                    WHERE user_id = ?;
+                `, [
+                    next.user.name,
+                    next.user.email,
+                    next.user.password,
+                    next.user.salt,
+                    user_id,
+                ]);
+
+                return this.findOne({
+                    user_id,
+                });
+            });
+
+    }
+
 }
 
 module.exports = UsersRepository;
