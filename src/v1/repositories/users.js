@@ -306,6 +306,21 @@ class UsersRepository {
 
     }
 
+    static remove(user_id) {
+
+        return this.findOne({ user_id })
+            .then(() => {
+                return connWrite.update(`
+                    UPDATE users
+                    SET active = 0, deleted_at = NOW()
+                    WHERE user_id = ?;
+                `, [
+                    user_id,
+                ]);
+            });
+
+    }
+
 }
 
 module.exports = UsersRepository;
