@@ -10,6 +10,7 @@ router.get('/users', require('./controllers/api/users/list'));
 router.post('/users', require('./controllers/api/users/store'));
 router.get('/users/:user_id', getUserMiddleware, require('./controllers/api/users/show'));
 router.put('/users/:user_id', getUserMiddleware, require('./controllers/api/users/update'));
+router.put('/users/:user_id/active/:active', getUserMiddleware, require('./controllers/api/users/active'));
 router.delete('/users/:user_id', getUserMiddleware, require('./controllers/api/users/remove'));
 
 // Erro 404

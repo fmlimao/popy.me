@@ -113,7 +113,6 @@ class UsersRepository {
                         , created_at
                     FROM users
                     WHERE deleted_at IS NULL
-                    AND active = 1
                     ${where.length ? `AND ${where.join(' AND ')}` : 'AND 1 = 0'}
                     ;
                 `, values);
@@ -296,6 +295,52 @@ class UsersRepository {
                     next.user.email,
                     next.user.password,
                     next.user.salt,
+                    user_id,
+                ]);
+
+                return this.findOne({
+                    user_id,
+                });
+            });
+
+    }
+
+    static active(user_id, active) {
+
+        return this.findOne({ user_id })
+            .then(async findRet => {
+                const user = findRet.content.user;
+
+                const ret = new JsonReturn();
+
+                ret.addFields(['active']);
+
+                if (!validator(ret, {
+                    active,
+                }, {
+                    active: 'required|integer|between:0,1',
+                })) {
+                    ret.setError(true);
+                    ret.setCode(400);
+                    ret.addMessage('Verifique todos os campos.');
+                    throw ret;
+                }
+
+                const next = {
+                    active,
+                    user,
+                    ret,
+                };
+
+                return next;
+            })
+            .then(async next => {
+                await connWrite.update(`
+                    UPDATE users
+                    SET active = ?
+                    WHERE user_id = ?;
+                `, [
+                    next.active,
                     user_id,
                 ]);
 
