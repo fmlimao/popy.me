@@ -7,6 +7,7 @@ const getUserMiddleware = require('./middlewares/api/get-user');
 router.use(require('./middlewares/api/json-return'));
 
 router.get('/users', require('./controllers/api/users/list'));
+router.post('/users', require('./controllers/api/users/store'));
 router.get('/users/:user_id', getUserMiddleware, require('./controllers/api/users/show'));
 
 // Erro 404

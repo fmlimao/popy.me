@@ -1,5 +1,9 @@
-const JsonReturn = require('../helpers/json-return');
+const bcrypt = require('bcrypt');
 const connRead = require('../database/conn-read');
+const connWrite = require('../database/conn-write');
+const JsonReturn = require('../helpers/json-return');
+const errorHandler = require('../helpers/error-handler');
+const validator = require('../helpers/validator');
 
 class UsersRepository {
 
@@ -122,6 +126,84 @@ class UsersRepository {
                 reject(ret);
             }
         });
+
+    }
+
+    static create(fields) {
+
+        return new Promise((resolve, reject) => {
+            const ret = new JsonReturn();
+
+            ret.addFields(['name', 'email', 'password']);
+
+            const { name, email, password } = fields;
+
+            if (!validator(ret, {
+                name,
+                email,
+                password,
+            }, {
+                name: 'required|string|min:3|max:128',
+                email: 'required|string|email|max:128',
+                password: 'required|string|max:32',
+            })) {
+                ret.setError(true);
+                ret.setCode(400);
+                ret.addMessage('Verifique todos os campos.');
+                return reject(ret);
+            }
+
+            const next = {
+                name,
+                email,
+                password,
+                ret,
+            };
+
+            resolve(next);
+        })
+            .then(async next => {
+                const userExists = await connRead.getOne(`
+                    SELECT user_id
+                    FROM users
+                    WHERE deleted_at IS NULL
+                    AND email = ?;
+                `, [
+                    next.email,
+                ]);
+
+                if (userExists) {
+                    next.ret.setFieldError('email', true, 'Já existe um usuário com esta e-mail.');
+
+                    next.ret.setError(true);
+                    next.ret.setCode(400);
+                    next.ret.addMessage('Verifique todos os campos.');
+
+                    throw next.ret;
+                }
+
+                return next;
+            })
+            .then(async next => {
+                next.saltLength = Number(process.env.AUTH_SALT_LENGTH);
+                next.salt = bcrypt.genSaltSync(next.saltLength);
+                next.newPassword = bcrypt.hashSync(next.password, next.salt);
+
+                return next;
+            })
+            .then(async next => {
+                const user_id = await connWrite.insert(`
+                    INSERT INTO users (name, email, password, salt, active)
+                    VALUES (?, ?, ?, ?, 1);
+                `, [
+                    next.name,
+                    next.email,
+                    next.newPassword,
+                    next.salt,
+                ]);
+
+                return this.findOne({ user_id });
+            });
 
     }
 
