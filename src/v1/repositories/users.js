@@ -55,6 +55,9 @@ class UsersRepository {
                         user_id
                         , name
                         , email
+                        , password
+                        , salt
+                        , active
                         , created_at
                     FROM users
                     WHERE deleted_at IS NULL
@@ -74,6 +77,52 @@ class UsersRepository {
                 ret.addContent('users', next.users);
                 return ret.generate();
             })
+    }
+
+    static findOne({ user_id, email }) {
+
+        return new Promise(async (resolve, reject) => {
+            let ret = new JsonReturn();
+
+            try {
+                const where = [];
+                const values = [];
+
+                if (typeof user_id !== 'undefined') {
+                    where.push(`user_id = ?`);
+                    values.push(user_id);
+                }
+
+                if (typeof email !== 'undefined') {
+                    where.push(`email = ?`);
+                    values.push(email);
+                }
+
+                const user = await connRead.getOne(`
+                    SELECT
+                        user_id
+                        , name
+                        , email
+                        , password
+                        , salt
+                        , active
+                        , created_at
+                    FROM users
+                    WHERE deleted_at IS NULL
+                    AND active = 1
+                    ${where.length ? `AND ${where.join(' AND ')}` : 'AND 1 = 0'}
+                    ;
+                `, values);
+
+                ret.addContent('user', user);
+
+                resolve(ret.generate());
+            } catch (err) {
+                ret = errorHandler(err, ret);
+                reject(ret);
+            }
+        });
+
     }
 
 }

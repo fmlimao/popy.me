@@ -1,10 +1,8 @@
 const errorHandler = require('../../../helpers/error-handler');
-const UserRepository = require('../../../respositories/users');
+const UserRepository = require('../../../repositories/users');
 
 module.exports = async (req, res) => {
     const draw = req.query.draw || null;
-    const searchValue = req.query.search || null;
-    console.log('searchValue', searchValue);
 
     let ret = req.ret;
 
@@ -18,6 +16,12 @@ module.exports = async (req, res) => {
     try {
         const usersRet = await UserRepository.findAll({
             filter: req.query,
+        });
+
+        usersRet.content.users = usersRet.content.users.map(user => {
+            delete user.password;
+            delete user.salt;
+            return user;
         });
 
         if (draw) {
