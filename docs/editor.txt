@@ -1,0 +1,5 @@
+https://editor.swagger.io/
+
+https://app.swaggerhub.com/apis/fmlimao/NodeAdminBoilerplate/1.0.0#/undefined
+
+https://swagger.io/docs/specification/authentication/api-keys/
