@@ -27,7 +27,7 @@ router.post('/auth', require('./controllers/api/auth/auth'));
 router.use(authMiddleware);
 
 // Rota de dados do Usuário do Token
-router.get('/auth/me', require('./controllers/api/auth/me'));
+router.get('/me', require('./controllers/api/users/me'));
 
 // Rotas de controle de Usuários
 router.get('/users', require('./controllers/api/users/list'));

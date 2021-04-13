@@ -14,9 +14,9 @@ servers:
     description: Servidor de produção
 
 tags:
-- name: Autenticação
-- name: Usuários
-  description: Rotas de controle de usuários
+  - name: Autenticação
+  - name: Usuários
+    description: Rotas de controle de usuários
 
 paths:
   /auth:
@@ -61,8 +61,8 @@ paths:
           description: Servidor em manutenção.
         default:
           description: Servidor fora do ar.
-
-  /auth/me:
+  
+  /me:
     get:
       tags:
         - Usuários
@@ -86,6 +86,168 @@ paths:
                             $ref: "#/components/schemas/User"
         401:
           description: Token inválido.
+        503:
+          description: Servidor em manutenção.
+        default:
+          description: Servidor fora do ar.
+  
+  /users:
+    get:
+      tags:
+        - Usuários
+      security:
+        - ApiKeyAuth: []
+      summary: Retorna a lista de usuários.
+      description: Esta rota retorna todas as informações da listagem de usuários.
+      responses:
+        200:
+          description: Usuários encontrados.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/DefaultResponse"
+                  - type: object
+                    properties:
+                      content:
+                        properties:
+                          users:
+                            $ref: "#/components/schemas/ArrayOfUser"
+        401:
+          description: Token inválido.
+        503:
+          description: Servidor em manutenção.
+        default:
+          description: Servidor fora do ar.
+    post:
+      tags:
+        - Usuários
+      security:
+        - ApiKeyAuth: []
+      summary: Insere um usuário.
+      description: Esta rota insere e retorna os dados de um usuário.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "Nome do Usuario"
+                email:
+                  type: string
+                  example: "email@do-usuario.com"
+                password:
+                  type: string
+                  example: "senhadousuario"
+      responses:
+        201:
+          description: Usuário inserido.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/DefaultResponse"
+                  - type: object
+                    properties:
+                      code:
+                        example: 201
+                      content:
+                        properties:
+                          user:
+                            $ref: "#/components/schemas/User"
+        400:
+          description: Formulário inválido.
+        503:
+          description: Servidor em manutenção.
+        default:
+          description: Servidor fora do ar.
+  
+  /users/:user_id:
+    get:
+      tags:
+        - Usuários
+      security:
+        - ApiKeyAuth: []
+      summary: Retorna um usuário específico.
+      description: Esta rota retorna todas as informações de um usuário específico.
+      responses:
+        200:
+          description: Usuário encontrado.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/DefaultResponse"
+                  - type: object
+                    properties:
+                      content:
+                        properties:
+                          user:
+                            $ref: "#/components/schemas/User"
+        401:
+          description: Token inválido.
+        503:
+          description: Servidor em manutenção.
+        default:
+          description: Servidor fora do ar.
+    put:
+      tags:
+        - Usuários
+      security:
+        - ApiKeyAuth: []
+      summary: Edita um usuário.
+      description: Esta rota edita e retorna os dados de um usuário.
+      requestBody:
+        # required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "Nome do Usuario"
+                email:
+                  type: string
+                  example: "email@do-usuario.com"
+                password:
+                  type: string
+                  example: "senhadousuario"
+      responses:
+        200:
+          description: Usuário editado.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/DefaultResponse"
+                  - type: object
+                    properties:
+                      content:
+                        properties:
+                          user:
+                            $ref: "#/components/schemas/User"
+        400:
+          description: Formulário inválido.
+        503:
+          description: Servidor em manutenção.
+        default:
+          description: Servidor fora do ar.
+    delete:
+      tags:
+        - Usuários
+      security:
+        - ApiKeyAuth: []
+      summary: Remove um usuário.
+      description: Esta rota remove um usuário.
+      responses:
+        204:
+          description: Usuário removido.
+        400:
+          description: Formulário inválido.
         503:
           description: Servidor em manutenção.
         default:
@@ -128,31 +290,10 @@ components:
         created_at:
           type: string
           example: "2021-03-29 20:43:30"
-    # Client:
-    #   type: object
-    #   properties:
-    #     client_id:
-    #       type: integer
-    #       example: 1
-    #     name:
-    #       type: string
-    #       example: Usuário 1
-    #     is_owner:
-    #       type: integer
-    #       example: 0
-    #       description: Flag que diferencia os usuários do Sistema e os usuários dos Clientes
-    # Project:
-    #   type: object
-    #   properties:
-    #     project_id:
-    #       type: integer
-    #       example: 1
-    #     client_id:
-    #       type: integer
-    #       example: 1
-    #     name:
-    #       type: string
-    #       example: Usuário 1
+    ArrayOfUser:
+      type: array
+      items:
+        $ref: "#/components/schemas/User"
   
   securitySchemes:
     ApiKeyAuth:
