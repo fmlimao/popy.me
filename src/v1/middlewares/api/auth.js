@@ -17,7 +17,7 @@ module.exports = async (req, res, next) => {
         const decodedToken = jwt.verify(token, key);
 
         const userExists = await UsersRepository.findOne({
-            user_id:  decodedToken.id,
+            user_id: decodedToken.id,
         });
 
         const user = userExists.content.user;
@@ -26,6 +26,11 @@ module.exports = async (req, res, next) => {
             ret.setCode(401);
             throw new Error('Token inválido.');
         }
+
+        user.roles = (await UsersRepository.findAllRoles(decodedToken.id)).content.roles
+            .map(role => {
+                return role.slug;
+            });
 
         delete user.password;
         delete user.salt;

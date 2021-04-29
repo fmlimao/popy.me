@@ -15,7 +15,7 @@ class AuthRepository {
             try {
                 ret.addFields(['email', 'password']);
 
-                const dataValidate = validator(ret, {
+                validator(ret, {
                     email,
                     password,
                 }, {
@@ -28,7 +28,6 @@ class AuthRepository {
                 }
 
                 const userRet = await UsersRepository.findOne({ email });
-                console.log('userRet', userRet);
 
                 if (!userRet.content.user) {
                     ret.setError(true);
