@@ -17,8 +17,6 @@ router.get('/doc.yaml', (req, res) => {
     res.sendFile(path.resolve(__dirname, '../../docs/fmlimao-PopyMe-1.0.0-resolved.yaml'));
 });
 
-router.use(require('./middlewares/api/json-return'));
-
 // Middleware para API em Manutenção
 router.use(maintenanceMiddleware);
 
