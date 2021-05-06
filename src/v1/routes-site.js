@@ -9,4 +9,10 @@ router.use(maintenanceMiddleware);
 
 router.get('/', require('./controllers/site/home'));
 
+// Erro 404
+router.use(require('./middlewares/site/error-404'));
+
+// Erro 500
+router.use(require('./middlewares/site/error-500'));
+
 module.exports = router;
