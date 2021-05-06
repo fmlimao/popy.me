@@ -366,6 +366,44 @@ class UsersRepository {
 
     }
 
+    static findAllRoles(user_id) {
+
+        return new Promise(async (resolve, reject) => {
+            let ret = new JsonReturn();
+
+            try {
+                const where = [];
+                const values = [];
+
+                if (typeof user_id !== 'undefined') {
+                    where.push(`user_id = ?`);
+                    values.push(user_id);
+                }
+
+                const roles = await connRead.getAll(`
+                    SELECT R.role_id, R.name, R.slug
+                    FROM users U
+                    INNER JOIN user_roles UR ON (U.user_id = UR.user_id AND UR.deleted_at IS NULL)
+                    INNER JOIN roles R ON (UR.role_id = R.role_id AND R.deleted_at IS NULL)
+                    WHERE U.deleted_at IS NULL
+                    AND U.active = 1
+                    AND U.user_id = ?
+                    ;
+                `, [
+                    user_id,
+                ]);
+
+                ret.addContent('roles', roles);
+
+                resolve(ret.generate());
+            } catch (err) {
+                ret = errorHandler(err, ret);
+                reject(ret);
+            }
+        });
+
+    }
+
 }
 
 module.exports = UsersRepository;
