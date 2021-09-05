@@ -1,0 +1,5 @@
+https://editor.swagger.io/
+
+https://app.swaggerhub.com/apis/fmlimao/PopyMe/1.0.0#/info
+
+https://swagger.io/docs/specification/authentication/api-keys/
