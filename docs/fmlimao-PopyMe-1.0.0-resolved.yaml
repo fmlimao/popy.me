@@ -45,8 +45,8 @@ paths:
     post:
       tags:
         - "Rotas Privadas"
-      #       security:
-      #         - ApiKeyAuth: []
+      security:
+        - ApiKeyAuth: []
       summary: Insere um perfil público.
       description: Esta rota insere e retorna os dados de um perfil público.
       requestBody:
@@ -474,8 +474,8 @@ components:
 #       items:
 #         $ref: "#/components/schemas/User"
 
-#   securitySchemes:
-#     ApiKeyAuth:
-#       type: apiKey
-#       in: header
-#       name: x-access-token
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-access-token

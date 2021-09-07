@@ -33,6 +33,8 @@ router.get('/mail', async (req, res) => {
 
 // Rotas Privadas
 
+router.use(require('./middlewares/auth'))
+
 router.post('/profiles', require('./controllers/profiles/store'))
 
 module.exports = router

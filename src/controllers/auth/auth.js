@@ -27,7 +27,7 @@ module.exports = async (req, res) => {
     }
 
     const user = await sql.getOne(`
-      SELECT user_id, name, email, password, salt
+      SELECT user_id, hash, name, email, password, salt
       FROM users
       WHERE deleted_at IS NULL
       AND active = 1
@@ -53,7 +53,7 @@ module.exports = async (req, res) => {
     }
 
     const login = {
-      id: user.user_id
+      hash: user.hash
     }
 
     const exp = Number(process.env.TOKEN_EXPIRATION_SEC)
