@@ -8,6 +8,9 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 app.use(express.static('./public'))
 
+app.set('views', './src/views')
+app.set('view engine', 'ejs')
+
 // Rotas
 app.use(require('./src/routes'))
 

@@ -18,7 +18,6 @@ tags:
   - name: "Rotas Privadas"
 
 paths:
-  
   /profiles:
     get:
       tags:
@@ -46,8 +45,8 @@ paths:
     post:
       tags:
         - "Rotas Públicas"
-#       security:
-#         - ApiKeyAuth: []
+      #       security:
+      #         - ApiKeyAuth: []
       summary: Insere um perfil público.
       description: Esta rota insere e retorna os dados de um perfil público.
       requestBody:
@@ -82,7 +81,7 @@ paths:
           description: Servidor em manutenção.
         default:
           description: Servidor fora do ar.
-  
+
   /profile/:profileHash:
     get:
       tags:
@@ -152,7 +151,7 @@ paths:
           description: Servidor em manutenção.
         default:
           description: Servidor fora do ar.
-  
+
 #   /me:
 #     get:
 #       tags:
@@ -181,7 +180,7 @@ paths:
 #           description: Servidor em manutenção.
 #         default:
 #           description: Servidor fora do ar.
-  
+
 #   /users:
 #     get:
 #       tags:
@@ -255,7 +254,7 @@ paths:
 #           description: Servidor em manutenção.
 #         default:
 #           description: Servidor fora do ar.
-  
+
 #   /users/:user_id:
 #     get:
 #       tags:
@@ -404,7 +403,7 @@ components:
 #       type: array
 #       items:
 #         $ref: "#/components/schemas/User"
-  
+
 #   securitySchemes:
 #     ApiKeyAuth:
 #       type: apiKey

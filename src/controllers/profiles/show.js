@@ -1,6 +1,6 @@
 const JsonResponse = require('fm-json-response')
 const errorHandler = require('fm-express-error-handler')
-const ProfilesRepository = require('../../repositories/profiles')
+const sql = require('../../database/conn')
 
 module.exports = async (req, res) => {
   let ret = new JsonResponse()
@@ -8,9 +8,27 @@ module.exports = async (req, res) => {
   try {
     const { profileHash } = req.params
 
-    const profile = await ProfilesRepository.getOneByHash(profileHash)
+    const profile = await sql.getOne(`
+      SELECT
+        hash
+        , name
+        , positive_votes
+        , negative_votes
+      FROM profiles
+      WHERE deleted_at IS NULL
+      AND active = 1
+      AND hash = ?;
+    `, [
+      profileHash
+    ])
 
-    ret.addContent('profile', profile.content.profile)
+    if (!profile) {
+      ret.setCode(404)
+      ret.addMessage('Perfil não encontrado')
+      throw ret
+    }
+
+    ret.addContent('profile', profile)
     res.status(ret.getCode()).json(ret.generate())
   } catch (error) {
     ret = errorHandler(error, ret)
