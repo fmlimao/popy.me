@@ -26,6 +26,7 @@ module.exports = async (req, res) => {
 
     // se nao vier nenhum, "usuário não encontrado"
     if (!user) {
+      ret.setError(true)
       ret.setCode(400)
       ret.addMessage('Usuário não encontrado')
       throw ret

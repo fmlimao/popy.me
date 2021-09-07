@@ -17,10 +17,10 @@ router.get('/', require('./controllers/version/index'))
 
 router.get('/profiles', require('./controllers/profiles/list'))
 router.get('/profiles/:profileHash', require('./controllers/profiles/show'))
-router.post('/profiles', require('./controllers/profiles/store'))
 
 router.post('/auth/create', require('./controllers/auth/create'))
-router.get('/auth/email-confirm/:emailHash', require('./controllers/auth/email-confirm'))
+router.post('/auth/email-confirm/:emailHash', require('./controllers/auth/email-confirm'))
+router.post('/auth', require('./controllers/auth/auth'))
 
 router.get('/mail', async (req, res) => {
   const emailContent = await getContent(res, 'mail/email-confirm.ejs', {
@@ -32,5 +32,7 @@ router.get('/mail', async (req, res) => {
 })
 
 // Rotas Privadas
+
+router.post('/profiles', require('./controllers/profiles/store'))
 
 module.exports = router

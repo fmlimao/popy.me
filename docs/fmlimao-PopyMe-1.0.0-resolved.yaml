@@ -44,7 +44,7 @@ paths:
           description: Servidor fora do ar.
     post:
       tags:
-        - "Rotas Públicas"
+        - "Rotas Privadas"
       #       security:
       #         - ApiKeyAuth: []
       summary: Insere um perfil público.
@@ -145,6 +145,76 @@ paths:
                             example: token.do.usuario
         400:
           description: Formulário inválido.
+        404:
+          description: Usuário não encontrado.
+        503:
+          description: Servidor em manutenção.
+        default:
+          description: Servidor fora do ar.
+
+  /auth/create:
+    post:
+      tags:
+        - "Rotas Públicas"
+      summary: Realiza a cadastro do usuário.
+      description: Esta rota realiza o cadastro do usuário e envia o email de verificação.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "Nome do usuário"
+                email:
+                  type: string
+                  example: "email@do-usuario.com"
+                password:
+                  type: string
+                  example: "senhadousuario"
+      responses:
+        201:
+          description: Usuário cadastrado e email enviado.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/DefaultResponse"
+                  - type: object
+                    properties:
+                      code:
+                        example: 201
+                      messages:
+                        example: ["Enviamos um e-mail com os próximos passos para finalizar o seu cadastro."]
+        400:
+          description: Formulário inválido.
+        503:
+          description: Servidor em manutenção.
+        default:
+          description: Servidor fora do ar.
+
+  /auth/email-confirm/emailHash:
+    post:
+      tags:
+        - "Rotas Públicas"
+      summary: Realiza a liberação do usuário.
+      description: Esta rota realiza a verificação de e-mail e liberação do usuário.
+      responses:
+        201:
+          description: Usuário liberado.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/DefaultResponse"
+                  - type: object
+                    properties:
+                      code:
+                        example: 201
+                      messages:
+                        example: ["Usuário ativado com sucesso."]
         404:
           description: Usuário não encontrado.
         503:
